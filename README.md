@@ -17,30 +17,43 @@ This repository builds and publishes a hardened `pgcli` image intended to replac
 - `Dockerfile`: hardened image definition
 - `requirements.in`: top-level Python dependency intent
 - `requirements.lock`: fully pinned, hash-locked dependency graph
+- `Makefile`: minimal helper targets for build/test/publish/update
 - `scripts/update-lock.sh`: regenerate `requirements.lock` safely
 - `scripts/get-dockerhub-digest.sh`: resolve digest for Docker Hub base tags
 
-## Build image
+## Quickstart (idiot-proof)
 
-Set your image location (example GHCR namespace):
+Set your image location once:
 
 ```bash
 export IMAGE=ghcr.io/<org-or-user>/pgcli
 export VERSION=4.3.0-r1
 ```
 
-Build a local image:
+Run the full release flow:
 
 ```bash
-docker build --pull --platform linux/amd64 -t "$IMAGE:$VERSION" .
+make release IMAGE="$IMAGE" VERSION="$VERSION"
 ```
 
-## Verify locally
+This runs: build, test (`pgcli --version` + non-root uid), push, and prints `image@sha256:digest`.
+
+## Minimal make targets
+
+```bash
+make build   IMAGE="$IMAGE" VERSION="$VERSION"
+make test    IMAGE="$IMAGE" VERSION="$VERSION"
+make publish IMAGE="$IMAGE" VERSION="$VERSION"
+make digest  IMAGE="$IMAGE" VERSION="$VERSION"
+make update
+```
+
+## Manual verification checklist
 
 1. Verify `pgcli` runs:
 
 ```bash
-docker run --rm "$IMAGE:$VERSION" --version
+make test IMAGE="$IMAGE" VERSION="$VERSION"
 ```
 
 2. Verify container is non-root:
@@ -62,19 +75,13 @@ docker run --rm --entrypoint id "$IMAGE:$VERSION"
 Authenticate to GHCR first (`docker login ghcr.io`). Then push:
 
 ```bash
-docker push "$IMAGE:$VERSION"
+make publish IMAGE="$IMAGE" VERSION="$VERSION"
 ```
 
 ## Get immutable digest after publish
 
 ```bash
-docker buildx imagetools inspect "$IMAGE:$VERSION" --format '{{json .Manifest.Digest}}'
-```
-
-or:
-
-```bash
-docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE:$VERSION"
+make digest IMAGE="$IMAGE" VERSION="$VERSION"
 ```
 
 Expected form:
@@ -101,7 +108,7 @@ Do not use mutable tags in production manifests.
 2. Regenerate lock + hashes:
 
 ```bash
-./scripts/update-lock.sh
+make update
 ```
 
 3. Review lockfile diff for unexpected transitive changes.
@@ -114,7 +121,7 @@ Do not use mutable tags in production manifests.
 Resolve newest digest for chosen base tag:
 
 ```bash
-./scripts/get-dockerhub-digest.sh library/python 3.12.8-slim-bookworm
+make pin-base
 ```
 
 Update the `FROM ...@sha256:...` line in `Dockerfile`, then rebuild, verify, publish, and roll out by digest.
@@ -129,13 +136,17 @@ Update the `FROM ...@sha256:...` line in `Dockerfile`, then rebuild, verify, pub
 
 1. Update `requirements.in` and regenerate `requirements.lock`.
 2. Optionally refresh base digest.
-3. Build image.
+3. Build, verify, publish, and print digest in one step:
+
+```bash
+make release IMAGE="$IMAGE" VERSION="$VERSION"
+```
+
 4. Verify:
    - `pgcli --version` works
    - runtime uid is non-root (`10001`)
-5. Push image.
-6. Record the pushed digest.
-7. Update downstream consumers to `repo@sha256:<digest>`.
+5. Record the pushed digest.
+6. Update downstream consumers to `repo@sha256:<digest>`.
 
 ## Remaining trust assumptions and risks
 
