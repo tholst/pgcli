@@ -1,1 +1,2 @@
 pgcli==4.3.0
+typing-extensions>=4.6  # transitive from psycopg; must be explicit for --require-hashes

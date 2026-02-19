@@ -1,25 +1,32 @@
 SHELL := /usr/bin/env bash
 
-IMAGE ?= ghcr.io/<org-or-user>/pgcli
+IMAGE ?= ghcr.io/tholst/pgcli
 VERSION ?= 4.3.0-r1
+PLATFORMS ?= linux/amd64,linux/arm64
 REF := $(IMAGE):$(VERSION)
 
-.PHONY: help build test publish digest release update pin-base
+.PHONY: help build build-native test publish digest release update pin-base
 
 help:
-	@echo "Usage: make <target> IMAGE=ghcr.io/<org-or-user>/pgcli VERSION=4.3.0-r1"
+	@echo "Usage: make <target> IMAGE=ghcr.io/tholst/pgcli VERSION=4.3.0-r1"
 	@echo
 	@echo "Targets:"
-	@echo "  build    Build container image"
-	@echo "  test     Verify pgcli runs and container is non-root"
-	@echo "  publish  Push image tag to registry"
-	@echo "  digest   Print immutable image digest reference"
-	@echo "  release  build + test + publish + digest"
-	@echo "  update   Regenerate requirements.lock with hashes"
-	@echo "  pin-base Resolve current base-image digest"
+	@echo "  build        Build multi-platform image (amd64 + arm64)"
+	@echo "  build-native Build for current platform only (faster iteration)"
+	@echo "  test         Verify pgcli runs and container is non-root"
+	@echo "  publish      Push image tag to registry"
+	@echo "  digest       Print immutable image digest reference"
+	@echo "  release      build-native + test + build (multi-platform) + digest"
+	@echo "  update       Regenerate requirements.lock with hashes"
+	@echo "  pin-base     Resolve current base-image digest"
+	@echo
+	@echo "Set PLATFORMS=linux/amd64,linux/arm64 to customize build target."
 
 build:
-	docker build --pull --platform linux/amd64 -t "$(REF)" .
+	docker buildx build --pull --platform "$(PLATFORMS)" -t "$(REF)" --push .
+
+build-native:
+	docker build --pull -t "$(REF)" .
 
 test:
 	docker run --rm "$(REF)" --version
@@ -36,7 +43,7 @@ digest:
 	fi; \
 	echo "$(IMAGE)@$$digest"
 
-release: build test publish digest
+release: build-native test build digest
 
 update:
 	./scripts/update-lock.sh

@@ -11,6 +11,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN groupadd --system --gid 10001 pgcli \
     && useradd --system --uid 10001 --gid 10001 --home /home/pgcli --create-home --shell /usr/sbin/nologin pgcli
 
+# psycopg needs libpq at runtime.
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY requirements.lock /app/requirements.lock
