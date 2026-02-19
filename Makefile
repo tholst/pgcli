@@ -5,7 +5,7 @@ VERSION ?= 4.3.0-r1
 PLATFORMS ?= linux/amd64,linux/arm64
 REF := $(IMAGE):$(VERSION)
 
-.PHONY: help build build-native test publish digest release update pin-base
+.PHONY: help build build-native test publish digest release update pin-base check-latest release-latest
 
 help:
 	@echo "Usage: make <target> IMAGE=ghcr.io/tholst/pgcli VERSION=4.3.0-r1"
@@ -19,6 +19,8 @@ help:
 	@echo "  release      build-native + test + build (multi-platform) + digest"
 	@echo "  update       Regenerate requirements.lock with hashes"
 	@echo "  pin-base     Resolve current base-image digest"
+	@echo "  check-latest  Print latest pgcli version on PyPI"
+	@echo "  release-latest Upgrade to latest pgcli, rebuild lockfile, and release"
 	@echo
 	@echo "Set PLATFORMS=linux/amd64,linux/arm64 to customize build target."
 
@@ -50,3 +52,9 @@ update:
 
 pin-base:
 	./scripts/get-dockerhub-digest.sh library/python 3.12.8-slim-bookworm
+
+check-latest:
+	@curl -s https://pypi.org/pypi/pgcli/json | python3 -c "import sys,json; v=json.load(sys.stdin)['info']['version']; print('Latest pgcli on PyPI:', v)"
+
+release-latest:
+	./scripts/release-latest.sh

@@ -50,8 +50,31 @@ pgcli:
   command: ["--host", "db", "--port", "5432", "-U", "postgres", "mydb"]
 ```
 
+## Versioning
+
+Image tags mirror pgcli versions plus an optional revision:
+
+| Tag | Meaning |
+|-----|---------|
+| `4.3.0` | pgcli 4.3.0, first build |
+| `4.3.0-r1` | pgcli 4.3.0, first revision (packaging/base image fixes) |
+| `4.3.0-r2` | Same pgcli, second revision |
+| `4.3.1` | pgcli 4.3.1 upgrade |
+| `latest` | Latest release (convenience, avoid in production) |
+
+When pgcli gets a new release, bump the version in `requirements.in` and `Makefile` (VERSION). When you rebuild the same pgcli version (e.g. base image or lockfile update), bump the `-rN` suffix.
+
 ## Updating Dependencies
 
-1. Edit `requirements.in`
+**Manual:**
+1. Edit `requirements.in` (bump pgcli version if upgrading)
 2. Run `make update`
-3. Rebuild and republish
+3. Run `make release` to build, test, push, and print the digest
+
+**Automatic (upgrade to latest pgcli):**
+```bash
+make release-latest
+```
+Fetches the latest pgcli from PyPI, updates requirements, regenerates the lockfile, and runs the full release.
+
+**GitHub Actions:** A workflow runs weekly (Mondays) and on manual trigger to check for new pgcli versions, build, and push. It also commits updated `requirements.in` and `requirements.lock` when upgrading.

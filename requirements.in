@@ -1,2 +1,3 @@
-pgcli==4.3.0
+pgcli==4.4.0
+cli-helpers>=2.10.1  # avoid yanked 2.10.0; must be explicit for clean resolve
 typing-extensions>=4.6  # transitive from psycopg; must be explicit for --require-hashes

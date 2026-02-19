@@ -4,15 +4,15 @@
 #
 #    pip-compile --generate-hashes --output-file=requirements.lock --strip-extras requirements.in
 #
-cli-helpers==2.10.0 \
-    --hash=sha256:0e0936179b786c00c6b73863b5b9252889f7a54525f14014ec727e41ff22af28 \
-    --hash=sha256:5c7f294230b44589ece6eeae3d76408fb78087aeed3131e7bcdd282d08dea5f8
+cli-helpers==2.10.1 \
+    --hash=sha256:009e52d35f9ed818daf755608927af37c09848e8b457631b8955ded9e3d5673e \
+    --hash=sha256:48868af3633b737d8d47c988c023b70332c05c420a6dc55d4a611e56583eb299
     # via
-    #   cli-helpers
+    #   -r requirements.in
     #   pgcli
-click==8.3.1 \
-    --hash=sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a \
-    --hash=sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6
+click==8.1.7 \
+    --hash=sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28 \
+    --hash=sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de
     # via
     #   pgcli
     #   pgspecial
@@ -22,9 +22,9 @@ configobj==5.0.9 \
     # via
     #   cli-helpers
     #   pgcli
-pgcli==4.3.0 \
-    --hash=sha256:1b06710c837407465ad200b636a604b5e1a6ad3e05eabfd8306e13de247765b9 \
-    --hash=sha256:765ae1550c5508a481f19f16a99716c253fe91afb255797add2d635da20b6aef
+pgcli==4.4.0 \
+    --hash=sha256:5eac36b0e5afeff919baa3088e5ef49feef20815d18250f99f2cdf29851b64c4 \
+    --hash=sha256:bd5f8d68af28fd69551a3cb48a2849cad5f6854aa48022e9d98c6236d109eeae
     # via -r requirements.in
 pgspecial==2.2.1 \
     --hash=sha256:08d86faaf360603a25850e259efc083bded4c1e8ffd2cfe2950b8ceefdfb4c9c \

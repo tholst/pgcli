@@ -12,6 +12,7 @@ pip-compile \
   --generate-hashes \
   --resolver=backtracking \
   --strip-extras \
+  --rebuild \
   --output-file=requirements.lock \
   requirements.in
 
