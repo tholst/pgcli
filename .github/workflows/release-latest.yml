@@ -55,7 +55,7 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         run: make update
 
-      - name: Build and push
+      - name: Build, push, and tag latest
         if: steps.check.outputs.skip != 'true'
         env:
           IMAGE: ghcr.io/${{ github.repository }}

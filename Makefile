@@ -5,7 +5,7 @@ VERSION ?= 4.3.0-r1
 PLATFORMS ?= linux/amd64,linux/arm64
 REF := $(IMAGE):$(VERSION)
 
-.PHONY: help build build-native test publish digest release update pin-base check-latest release-latest
+.PHONY: help build build-native test publish digest release update pin-base check-latest release-latest tag-latest
 
 help:
 	@echo "Usage: make <target> IMAGE=ghcr.io/tholst/pgcli VERSION=4.3.0-r1"
@@ -16,7 +16,7 @@ help:
 	@echo "  test         Verify pgcli runs and container is non-root"
 	@echo "  publish      Push image tag to registry"
 	@echo "  digest       Print immutable image digest reference"
-	@echo "  release      build-native + test + build (multi-platform) + digest"
+	@echo "  release      build-native + test + build (multi-platform) + tag-latest + digest"
 	@echo "  update       Regenerate requirements.lock with hashes"
 	@echo "  pin-base     Resolve current base-image digest"
 	@echo "  check-latest  Print latest pgcli version on PyPI"
@@ -45,7 +45,10 @@ digest:
 	fi; \
 	echo "$(IMAGE)@$$digest"
 
-release: build-native test build digest
+tag-latest:
+	docker buildx imagetools create -t "$(IMAGE):latest" "$(REF)"
+
+release: build-native test build tag-latest digest
 
 update:
 	./scripts/update-lock.sh
