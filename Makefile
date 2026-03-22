@@ -1,14 +1,14 @@
 SHELL := /usr/bin/env bash
 
 IMAGE ?= ghcr.io/tholst/pgcli
-VERSION ?= 4.3.0-r1
+VERSION ?= $(shell grep -E '^pgcli==' requirements.in | sed 's/pgcli==//')
 PLATFORMS ?= linux/amd64,linux/arm64
 REF := $(IMAGE):$(VERSION)
 
 .PHONY: help build build-native test publish digest release update pin-base check-latest release-latest tag-latest
 
 help:
-	@echo "Usage: make <target> IMAGE=ghcr.io/tholst/pgcli VERSION=4.3.0-r1"
+	@echo "Usage: make <target> IMAGE=ghcr.io/tholst/pgcli VERSION=$(VERSION)"
 	@echo
 	@echo "Targets:"
 	@echo "  build        Build multi-platform image (amd64 + arm64)"
